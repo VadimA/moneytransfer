@@ -3,6 +3,7 @@ package org.money.back.controller;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import org.eclipse.jetty.server.Server;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +25,12 @@ import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
 public class TransactionControllerTest {
 
-    private static final String ID = "id";
-    private static final String ORIGIN_ACCOUT_ID = "originAccountId";
+    private static final String ORIGIN_ACCOUNT_ID = "originAccountId";
     private static final String TARGET_ACCOUNT_ID = "targetAccountId";
     private static final String AMOUNT = "amount";
     private static final String TRANSACTION_PATH = "/transactions/";
@@ -63,7 +65,9 @@ public class TransactionControllerTest {
             .when()
                 .get(TRANSACTION_PATH)
             .then()
+                .body("", Matchers.hasSize(2))
                 .body(containsString("originTestId"))
+                .body(containsString("targetTestId"))
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
@@ -74,12 +78,15 @@ public class TransactionControllerTest {
             .when()
                 .get(TRANSACTION_PATH + transaction.getId())
             .then()
+                .body(ORIGIN_ACCOUNT_ID, equalTo(transaction.getOriginAccountId()))
+                .body(TARGET_ACCOUNT_ID, equalTo(transaction.getTargetAccountId()))
+                .body(AMOUNT, is(transaction.getAmount().intValue()))
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
     @Test
     void shouldNotGetTransactionByNonExistId() {
-        Transaction transaction = transactionRepository.createNewTransaction(TestUtil.getFakeTransaction());
+        transactionRepository.createNewTransaction(TestUtil.getFakeTransaction());
         given()
                 .when()
                 .get(TRANSACTION_PATH + "nonExistsId")
@@ -96,6 +103,9 @@ public class TransactionControllerTest {
             .when()
                 .post(TRANSACTION_PATH)
             .then()
+                .body(ORIGIN_ACCOUNT_ID, equalTo(newTransaction.getOriginAccountId()))
+                .body(TARGET_ACCOUNT_ID, equalTo(newTransaction.getTargetAccountId()))
+                .body(AMOUNT, is(newTransaction.getAmount().intValue()))
                 .statusCode(Response.Status.CREATED.getStatusCode());
     }
 

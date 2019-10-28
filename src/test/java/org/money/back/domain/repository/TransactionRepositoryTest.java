@@ -11,14 +11,9 @@ import org.money.back.domain.repository.impl.TransactionRepositoryImpl;
 
 import java.math.BigDecimal;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-
 public class TransactionRepositoryTest {
 
     private static final int NUMBER_OF_TRANSACTIONS = 5;
-    private static final String TEST_EMAIL = "testEmail";
 
     private final TransactionRepository transactionRepository = TransactionRepositoryImpl.getInstance();
     private final AccountRepository accountRepository = AccountRepositoryImpl.getInstance();

@@ -4,14 +4,14 @@ import org.money.back.domain.model.Transaction;
 import org.money.back.domain.repository.TransactionRepository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TransactionRepositoryImpl implements TransactionRepository {
 
     private static final TransactionRepository INSTANCE = new TransactionRepositoryImpl();
-    private Map<String, Transaction> transactions = new HashMap<>();
+    private final Map<String, Transaction> transactions = new ConcurrentHashMap<>();
 
     private TransactionRepositoryImpl() {
     }

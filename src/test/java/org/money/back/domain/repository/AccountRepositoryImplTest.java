@@ -7,10 +7,6 @@ import org.money.back.domain.model.Account;
 import org.money.back.TestUtil;
 import org.money.back.domain.repository.impl.AccountRepositoryImpl;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-
 public class AccountRepositoryImplTest {
 
     private static final int NUMBER_OF_ACCOUNTS = 5;

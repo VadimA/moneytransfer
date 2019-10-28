@@ -3,6 +3,7 @@ package org.money.back.controller;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import org.eclipse.jetty.server.Server;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,13 +21,13 @@ import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.*;
 
 public class AccountControllerTest {
 
     private final AccountRepository accountRepository = AccountRepositoryImpl.getInstance();
-    private static final String ID = "id";
     private static final String NAME = "name";
+    private static final String EMAIL = "email";
     private static final String BALANCE = "balance";
     private static final String ACCOUNT_PATH = "/accounts/";
     private static final int SERVER_PORT = 9090;
@@ -58,6 +59,9 @@ public class AccountControllerTest {
             .when()
                 .post(ACCOUNT_PATH)
             .then()
+                .body(NAME, equalTo(newAccount.getName()))
+                .body(EMAIL, equalTo(newAccount.getEmail()))
+                .body(BALANCE, is(newAccount.getBalance().intValue()))
                 .statusCode(Response.Status.CREATED.getStatusCode());
     }
 
@@ -142,6 +146,7 @@ public class AccountControllerTest {
             .when()
                 .get(ACCOUNT_PATH)
             .then()
+                .body("", Matchers.hasSize(2))
                 .body(containsString("test1"))
                 .body(containsString("test2"))
                 .statusCode(Response.Status.OK.getStatusCode());
@@ -156,6 +161,9 @@ public class AccountControllerTest {
             .when()
                 .get(ACCOUNT_PATH + account.getId())
             .then()
+                .body(NAME, equalTo(account.getName()))
+                .body(EMAIL, equalTo(account.getEmail()))
+                .body(BALANCE, is(account.getBalance().intValue()))
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
