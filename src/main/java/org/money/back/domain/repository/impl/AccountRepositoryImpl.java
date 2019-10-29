@@ -45,7 +45,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public synchronized void removeAllAccounts(){
+    public void removeAllAccounts(){
         accounts.clear();
     }
 }

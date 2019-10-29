@@ -37,22 +37,29 @@ public class TransactionService {
         return transaction;
     }
 
-    //TODO: refactor by performance issue
-    public synchronized Transaction createNewTransaction(Transaction transaction) {
+    public Transaction createNewTransaction(Transaction transaction) {
         Account originAccount = accountRepository.getAccountById(transaction.getOriginAccountId());
         Account targetAccount = accountRepository.getAccountById(transaction.getTargetAccountId());
+        validateTransaction(transaction, originAccount, targetAccount);
+        synchronized (this) {
+            originAccount.withdraw(transaction.getAmount());
+            targetAccount.deposit(transaction.getAmount());
+            return transactionRepository.createNewTransaction(transaction);
+        }
+    }
+
+    void deleteAllTransactions() {
+        transactionRepository.removeAllTransactions();
+    }
+
+    private void validateTransaction(Transaction transaction, Account originAccount, Account targetAccount) {
         if (originAccount == null || targetAccount == null) {
             throw new AccountNotFoundException(originAccount == null
                     ? transaction.getOriginAccountId()
                     : transaction.getTargetAccountId());
         }
-
-        originAccount.withdraw(transaction.getAmount());
-        targetAccount.deposit(transaction.getAmount());
-        return transactionRepository.createNewTransaction(transaction);
-    }
-
-    void deleteAllTransactions() {
-        transactionRepository.removeAllTransactions();
+        if (originAccount.equals(targetAccount)) {
+            throw new IllegalArgumentException("Transaction can not be performed from account to the same account.");
+        }
     }
 }

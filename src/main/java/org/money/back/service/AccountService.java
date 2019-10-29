@@ -33,16 +33,17 @@ public class AccountService {
         return accountRepository.getAccountById(accountId);
     }
 
-    //TODO: refactor by performance issue
-    public synchronized Account addNewAccount(Account account) {
-        Account existsAccount = accountRepository.getAccountByEmail(account.getEmail());
-        if (Objects.nonNull(existsAccount)) {
-            throw new DuplicateAccountException(account.getEmail());
+    public Account addNewAccount(Account account) {
+        synchronized (this) {
+            Account existsAccount = accountRepository.getAccountByEmail(account.getEmail());
+            if (Objects.nonNull(existsAccount)) {
+                throw new DuplicateAccountException(account.getEmail());
+            }
+            return accountRepository.addNewAccount(account);
         }
-        return accountRepository.addNewAccount(account);
     }
 
     public void deleteAllAccounts() {
-        this.accountRepository.removeAllAccounts();
+       accountRepository.removeAllAccounts();
     }
 }

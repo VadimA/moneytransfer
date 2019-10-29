@@ -164,6 +164,21 @@ public class TransactionControllerTest {
     }
 
     @Test
+    void shouldNotPerformTransactionToItself() {
+        Account account1 = new Account("originTestId", "testEmail", "Fake Account", new BigDecimal("5000"));
+        accountRepository.addNewAccount(account1);
+        TransactionDTO newTransaction = new TransactionDTO(account1.getId(), account1.getId(), new BigDecimal("500"));
+
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(newTransaction)
+                .when()
+                .post(TRANSACTION_PATH)
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
     void shouldNotPerformTransactionForInsufficientBalance() {
         TransactionDTO newTransaction = prepareTestTransactionDTO();
         newTransaction.setAmount(WITDRAW_AMOUNT_MORE_THAN_BALANCE);

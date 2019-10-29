@@ -10,6 +10,8 @@ import org.money.back.domain.model.Transaction;
 
 import java.math.BigDecimal;
 
+import static org.money.back.TestUtil.TRANSACTION_AMOUNT;
+
 public class TransactionServiceTest {
 
     private final TransactionService transactionService = TransactionService.getInstance();
@@ -27,11 +29,19 @@ public class TransactionServiceTest {
 
     @Test
     void addNewTransactionsTest() {
-        Transaction transaction = TestUtil.getFakeTransaction();
-        transactionService.createNewTransaction(transaction);
+        Transaction newTransaction = TestUtil.getFakeTransaction();
+        transactionService.createNewTransaction(newTransaction);
 
         Assertions.assertEquals(1, transactionService.getAllTransactions().size());
-        Assertions.assertSame(transaction, transactionService.getTransactionById(transaction.getId()));
+        Assertions.assertSame(newTransaction, transactionService.getTransactionById(newTransaction.getId()));
+    }
+
+    @Test
+    void addTransactionFromAccountToTheSameAccountTest() {
+        Transaction newTransaction = new Transaction("originTestId", "originTestId", TRANSACTION_AMOUNT);
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> transactionService.createNewTransaction(newTransaction));
     }
 
     @Test
